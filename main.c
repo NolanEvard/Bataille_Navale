@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <windows.h>
+#include "fonction.c"
 #pragma execution_character_set( "utf-8" )
 
 int main() {
