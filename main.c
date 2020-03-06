@@ -7,9 +7,11 @@
 int main() {
     // Déclaration et initialisation des variables
     int choixPrincipal = 0, choixAide = 0;
+    FILE* verifUtilisateur = NULL;
     SetConsoleOutputCP(65001);
     //Affichage du menu principal
     printf("\n\n========== BATAILLE NAVALE ==========\n\n");
+    menu:
     printf("1. Jouer \n");
     printf("2. S'enregistrer \n");
     printf("3. Mes meilleurs scores \n");
@@ -32,7 +34,17 @@ int main() {
         case 1:
             break;
         case 2:
+                printf("\n\n========== S'enregistrer ============\n\n");
+                printf("Veuillez entrer votre nom d'utilisateur : \n");
+                verifUtilisateur = fopen("utilisateurs.usr", "w");
+                if (verifUtilisateur != NULL){
 
+                }
+                else{
+                    printf("Il y a eu une erreur, veuillez redémarrer le programme !");
+                }
+                system("Pause");
+                goto menu;
             break;
         case 3:
             break;
