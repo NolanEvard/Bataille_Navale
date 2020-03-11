@@ -166,3 +166,24 @@ int find(char *fileName,char *strSearch)
     return found;
 
 }
+void jeu ()
+{
+   /*char nomUtilisateur [41] = "";
+   int usercheck;
+   FILE* verif = NULL;
+   printf("\nVeuillez entrer votre nom d'utilisateur : ");
+   scanf("%c", nomUtilisateur);
+   verif = fopen("utilisateurs.usr", "r");
+   if (verif != NULL)
+   {
+       usercheck = find("utilisateurs.usr", nomUtilisateur);
+       if (usercheck)
+       {
+
+       }
+   }
+   else printf("Il y a eu un problème, veuillez redémarrer le programme");*/
+   int Planjeu [10] [10] = {0};
+
+
+}
