@@ -25,6 +25,7 @@ void menu()
     switch (choixPrincipal)
     {
         case 1:
+            jeu();
             break;
         case 2:
             enregistrement();
@@ -184,6 +185,80 @@ void jeu ()
    }
    else printf("Il y a eu un problème, veuillez redémarrer le programme");*/
    int Planjeu [10] [10] = {0};
+   int ligne = ' ';
+   int colonne = 0, counter = 0;
+    //position croiseur
+    Planjeu [2][4] = 1;
+    Planjeu [3][4] = 1;
+    Planjeu [4][4] = 1;
+    Planjeu [5][4] = 1;
+    //position porte-avion
+    Planjeu [0][9] = 1;
+    Planjeu [1][9] = 1;
+    Planjeu [2][9] = 1;
+    Planjeu [3][9] = 1;
+    Planjeu [4][9] = 1;
+    //position sous-marin 1
+    Planjeu [9][3] = 1;
+    Planjeu [9][4] = 1;
+    Planjeu [9][5] = 1;
+    //position sous-marin 2
+    Planjeu [3][5] = 1;
+    Planjeu [4][5] = 1;
+    Planjeu [5][5] = 1;
+    //position torpilleur
+    Planjeu [0][0] = 1;
+    Planjeu [1][0] = 1;
 
+    printf("\n\n========== Jouer à la bataille navale ==========\n\n");
+
+    for (int i = 0; i <10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            switch (Planjeu [i] [j])
+            {
+                case 0:
+                    printf("\033[0;31m");
+                    //printf("%c",219);
+                    //printf("\033[0m");
+                    printf("x  ");
+                    counter++;
+                    break;
+                case 1:
+                    printf("\033[0;31m");
+                    //printf("%c",219);
+                    //printf("\033[0m");
+                    printf("x  ");
+                    counter++;
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                default:
+                    break;
+            }
+            if (counter % 10 == 0) printf("\n");
+        }
+    }
+
+    do
+    {
+        printf("Veuillez entrer la coordonnées de colonne : ");
+        scanf("%d", &colonne);
+        if (colonne < 1 || colonne > 10) printf("La coordonnée entrée n'existe pas");
+    }
+    while (colonne < 1 || colonne > 10);
+
+    do
+    {
+        printf("Veuillez entrer la coordonnées de ligne : ");
+        scanf("%d", &ligne);
+        if ((ligne - 65) < 0 || (ligne - 65) > 9) printf("La coordonnée entrée n'existe pas");
+    }
+    while ((ligne - 65) < 0 || (ligne - 65) > 9);
 
 }
