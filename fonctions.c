@@ -220,16 +220,10 @@ void jeu ()
             {
                 case 0:
                     printf("\033[0;31m");
-                    //printf("%c",219);
-                    //printf("\033[0m");
-                    printf("x  ");
                     counter++;
                     break;
                 case 1:
                     printf("\033[0;31m");
-                    //printf("%c",219);
-                    //printf("\033[0m");
-                    printf("x  ");
                     counter++;
                     break;
                 case 2:
@@ -241,6 +235,7 @@ void jeu ()
                 default:
                     break;
             }
+            printf("\u2588");
             if (counter % 10 == 0) printf("\n");
         }
     }
