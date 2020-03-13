@@ -301,7 +301,39 @@ void jeu ()
         Planjeu [3][4] = 4;
         Planjeu [4][4] = 4;
         Planjeu [5][4] = 4;
-
+        croiseurCoule = 1;
     }
-
+    if(Planjeu [0][9] == 3 && Planjeu [1][9] == 3 && Planjeu [2][9] == 3 && Planjeu [3][9] == 3 && Planjeu [4][9] == 3)
+    {
+        //cases du porte-avion
+        Planjeu [0][9] = 4;
+        Planjeu [1][9] = 4;
+        Planjeu [2][9] = 4;
+        Planjeu [3][9] = 4;
+        Planjeu [4][9] = 4;
+        porteAvionCoule = 1;
+    }
+    if (Planjeu [9][3] == 3 && Planjeu [9][4] == 3 && Planjeu [9][5] == 3)
+    {
+        //cases du sous-marin 1
+        Planjeu [9][3] = 4;
+        Planjeu [9][4] = 4;
+        Planjeu [9][5] = 4;
+        sousMarin1Coule = 1;
+    }
+    if (Planjeu [3][5] == 3 && Planjeu [4][5] == 3 && Planjeu [5][5] == 3)
+    {
+        //cases du sous-marin 2
+        Planjeu [3][5] = 4;
+        Planjeu [4][5] = 4;
+        Planjeu [5][5] = 4;
+        sousMarin2Coule = 1;
+    }
+    if (Planjeu [0][0] == 3 && Planjeu [1][0] == 3)
+    {
+        //cases du torpilleur
+        Planjeu [0][0] = 4;
+        Planjeu [1][0] = 4;
+        torpilleurCoule = 1;
+    }
 }
