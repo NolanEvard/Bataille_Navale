@@ -2,18 +2,19 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <string.h>
-#include <windows.h>
 #include <conio.h>
 //#include "headers.h"
 //#include "fonctions.c"
-#pragma execution_character_set( "utf-8" )
+//#pragma execution_character_set( "utf-8" )
 void menu();
 void aide ();
 void enregistrement ();
 int find(char *fileName,char *strSearch);
 void jeu ();
+void afficherPlanJeu ( int tableau [10] [10]);
 
 int main() {
+    //SetConsoleOutputCP(65001);
     menu();
     return 0;
 }
@@ -21,7 +22,7 @@ void menu()
 {
     // Déclaration et initialisation des variables
     int choixPrincipal = 0;
-    SetConsoleOutputCP(65001);
+
     //Affichage du menu principal
     printf("\n\n========== BATAILLE NAVALE ==========\n\n");
     printf("1. Jouer \n");
@@ -204,7 +205,8 @@ void jeu ()
     }
     else printf("Il y a eu un problème, veuillez redémarrer le programme");*/
     int Planjeu [10] [10] = {0};
-    int ligne = ' ', colonne = 0, counter = 0, colonneInt = 0, croiseurCoule = 0, porteAvionCoule = 0, sousMarin1Coule = 0, sousMarin2Coule = 0, torpilleurCoule = 0;
+    char colonne = 0;
+    int ligne = 0, counter = 0, colonneInt = 0, croiseurCoule = 0, porteAvionCoule = 0, sousMarin1Coule = 0, sousMarin2Coule = 0, torpilleurCoule = 0;
     //position croiseur
     Planjeu [2][4] = 1;
     Planjeu [3][4] = 1;
@@ -228,112 +230,269 @@ void jeu ()
     Planjeu [0][0] = 1;
     Planjeu [1][0] = 1;
 
-    printf("\n\n========== Jouer à la bataille navale ==========\n\n");
+    printf("\n\n====================   Jouer à la bataille navale   ====================\n\n");
 
-    for (int i = 0; i <10; i++)
-    {
-        for (int j = 0; j < 10; j++)
+    afficherPlanJeu(Planjeu);
+    do{
+        //demande et enregistre les coordonnées entrées par l'utilisateur
+        do
         {
-            switch (Planjeu [i] [j])
+            printf("Veuillez entrer la coordonnee de colonne : ");
+            scanf("%c", &colonne);
+            //if (!(colonne >= 65 && colonne <= (65 + 10))) printf("\nLa coordonnée entree n'existe pas");
+        }
+            //controle la validité de la valeur entrée
+        while (!(colonne >= 65 && colonne <= (65 + 10)));
+        //demande et enregistre les coordonnées entrées par l'utilisateur
+        do
+        {
+        printf("\nVeuillez entrer la coordonnee de ligne : ");
+        scanf("%d", &ligne);
+        if (ligne < 1 || ligne > 10) printf("\nLa coordonnee entree n'existe pas");
+        }
+        //controle la validité de la valeur entrée
+        while (ligne < 1 || ligne > 10);
+        /* Convertit la lettre entrée pour la colonne visée en un chiffre cohérent pour le tableau
+         * en se servant du code ascii des lettres A à J */
+        colonneInt = colonne - 65;
+        //controle si la coodrdonnées entrée correspond à un bateau et définit la case sur "touché si c'est le cas"
+        if (Planjeu [colonneInt][ligne]) Planjeu [colonneInt][ligne] = 3;
+            //si la coordonnées ne correspond à aucun bateau alors la case est définie sur "a l'eau"
+        else if (Planjeu [colonneInt][ligne] == 0) Planjeu [colonneInt][ligne] = 2;
+        //si toutes les cases du croiseur sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
+        if (Planjeu [2][4] == 3 && Planjeu [3][4] == 3 && Planjeu [4][4] == 3 && Planjeu [5][4] == 3)
+        {
+            //cases du croiseur
+            Planjeu [2][4] = 4;
+            Planjeu [3][4] = 4;
+            Planjeu [4][4] = 4;
+            Planjeu [5][4] = 4;
+            croiseurCoule = 1;
+        }
+        //si toutes les cases du porte-avion sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
+        if(Planjeu [0][9] == 3 && Planjeu [1][9] == 3 && Planjeu [2][9] == 3 && Planjeu [3][9] == 3 && Planjeu [4][9] == 3)
+        {
+            //cases du porte-avion
+            Planjeu [0][9] = 4;
+            Planjeu [1][9] = 4;
+            Planjeu [2][9] = 4;
+            Planjeu [3][9] = 4;
+            Planjeu [4][9] = 4;
+            porteAvionCoule = 1;
+        }
+        //si toutes les cases du sous-marin 1 sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
+        if (Planjeu [9][3] == 3 && Planjeu [9][4] == 3 && Planjeu [9][5] == 3)
+        {
+            //cases du sous-marin 1
+            Planjeu [9][3] = 4;
+            Planjeu [9][4] = 4;
+            Planjeu [9][5] = 4;
+            sousMarin1Coule = 1;
+        }
+        //si toutes les cases du sous-marin 2 sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
+        if (Planjeu [3][5] == 3 && Planjeu [4][5] == 3 && Planjeu [5][5] == 3)
+        {
+            //cases du sous-marin 2
+            Planjeu [3][5] = 4;
+            Planjeu [4][5] = 4;
+            Planjeu [5][5] = 4;
+            sousMarin2Coule = 1;
+        }
+        //si toutes les cases du torpilleur sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
+        if (Planjeu [0][0] == 3 && Planjeu [1][0] == 3)
+        {
+            //cases du torpilleur
+            Planjeu [0][0] = 4;
+            Planjeu [1][0] = 4;
+            torpilleurCoule = 1;
+        }
+        printf("      A       B      C      D      E      F      G      H     I\n");
+//bordure du haut
+        printf("   ");
+        printf("%c", 201);
+        for (int f = 0; f <= 7; f++)
+        {
+            for (int a = 0; a <=5; a++) printf ("%c", 205);
+            printf("%c", 203);
+        }
+        for (int a = 0; a <=5; a++) printf ("%c", 205);
+        printf("%c", 187);
+        printf ("\n");
+        for (int e = 0; e <=8 ; e++)
+        {
+            printf ("%3d", e + 1);
+            for (int c = 0; c <= 8; c++)
+            {
+
+                printf("%c", 186);
+                switch (Planjeu [e] [c])
+                {
+                    case 0:
+                        printf("      ");
+                        break;
+                    case 1:
+                        printf("      ");
+                        break;
+                    case 2:
+                        printf("%c%c%c%c%c%c", 177, 177, 177, 177, 177, 177);
+                        break;
+                    case 3:
+                        printf("%c%c%c%c%c%c", 178, 178, 178, 178, 178, 178);
+                        break;
+                    case 4:
+                        printf("%c%c%c%c%c%c", 219, 219, 219, 219, 219, 219);
+                        break;
+                }
+            }
+            printf("%c", 186);
+            printf("\n");
+            printf("   ");
+            printf("%c", 204);
+            for (int d = 0; d <= 7; d++)
+            {
+                printf("%c%c%c%c%c%c", 205, 205, 205, 205, 205, 205);
+                printf("%c", 206);
+            }
+            printf("%c%c%c%c%c%c", 205, 205, 205, 205, 205, 205);
+            printf("%c", 185);
+            printf("\n");
+        }
+        printf ("%3d", 10);
+        for (int c = 0; c <= 8; c++)
+        {
+            printf("%c", 186);
+            switch (Planjeu [9] [c])
             {
                 case 0:
-                    //printf("\033[0;31m");
-                    counter++;
+                    printf("      ");
                     break;
                 case 1:
-                    //printf("\033[0;31m");
-                    counter++;
+                    printf("      ");
                     break;
-                 //a l'eau
                 case 2:
+                    printf("%c%c%c%c%c%c", 177, 177, 177, 177, 177, 177);
                     break;
-                //touché
                 case 3:
+                    printf("%c%c%c%c%c%c", 178, 178, 178, 178, 178, 178);
                     break;
-                //coulé
                 case 4:
-                    break;
-                default:
+                    printf("%c%c%c%c%c%c", 219, 219, 219, 219, 219, 219);
                     break;
             }
-            printf("  \u2588\u2588");
-            if (counter % 10 == 0)
+        }
+        printf("%c", 186);
+        printf("\n");
+        printf("   ");
+//bordure bas
+        printf("%c", 200);
+        for (int f = 0; f <= 7; f++)
+        {
+            for (int a = 0; a <=5; a++) printf ("%c", 205);
+            printf("%c", 202);
+        }
+        for (int a = 0; a <=5; a++) printf ("%c", 205);
+        printf("%c", 188);
+        printf("\n\n");
+        printf("%c%c%c%c%c%c : A l'eau\n\n", 177, 177, 177, 177, 177, 177);
+        printf("%c%c%c%c%c%c : Touche\n\n", 178, 178, 178, 178, 178, 178);
+        printf("%c%c%c%c%c%c : Coule\n\n\n", 219, 219, 219, 219, 219, 219);
+
+        system("Pause");
+    }
+    while (!(croiseurCoule == 1 && porteAvionCoule == 1 && sousMarin1Coule == 1 && sousMarin2Coule == 1 && torpilleurCoule == 1));
+    printf("\nVICTOIRE !!!");
+}
+void afficherPlanJeu (int tableau [10] [10])
+{
+    printf("      A       B      C      D      E      F      G      H     I\n");
+//bordure du haut
+    printf("   ");
+    printf("%c", 201);
+    for (int f = 0; f <= 7; f++)
+    {
+        for (int a = 0; a <=5; a++) printf ("%c", 205);
+        printf("%c", 203);
+    }
+    for (int a = 0; a <=5; a++) printf ("%c", 205);
+    printf("%c", 187);
+    printf ("\n");
+    for (int e = 0; e <=8 ; e++)
+    {
+        printf ("%3d", e + 1);
+        for (int c = 0; c <= 8; c++)
+        {
+
+            printf("%c", 186);
+            switch (tableau [e] [c])
             {
-                printf("\n");
-                for (int a = 0; a <= 40; a++)
-                {
-                    printf(" ");
-                }
-                printf("\n");
-            };
+                case 0:
+                    printf("      ");
+                    break;
+                case 1:
+                    printf("      ");
+                    break;
+                case 2:
+                    printf("%c%c%c%c%c%c", 177, 177, 177, 177, 177, 177);
+                    break;
+                case 3:
+                    printf("%c%c%c%c%c%c", 178, 178, 178, 178, 178, 178);
+                    break;
+                case 4:
+                    printf("%c%c%c%c%c%c", 219, 219, 219, 219, 219, 219);
+                    break;
+            }
+        }
+        printf("%c", 186);
+        printf("\n");
+        printf("   ");
+        printf("%c", 204);
+        for (int d = 0; d <= 7; d++)
+        {
+            printf("%c%c%c%c%c%c", 205, 205, 205, 205, 205, 205);
+            printf("%c", 206);
+        }
+        printf("%c%c%c%c%c%c", 205, 205, 205, 205, 205, 205);
+        printf("%c", 185);
+        printf("\n");
+    }
+    printf ("%3d", 10);
+    for (int c = 0; c <= 8; c++)
+    {
+        printf("%c", 186);
+        switch (tableau [9] [c])
+        {
+            case 0:
+                printf("      ");
+                break;
+            case 1:
+                printf("      ");
+                break;
+            case 2:
+                printf("%c%c%c%c%c%c", 177, 177, 177, 177, 177, 177);
+                break;
+            case 3:
+                printf("%c%c%c%c%c%c", 178, 178, 178, 178, 178, 178);
+                break;
+            case 4:
+                printf("%c%c%c%c%c%c", 219, 219, 219, 219, 219, 219);
+                break;
         }
     }
-    //demande et enregistre les coordonnées entrées par l'utilisateur
-    do
+    printf("%c", 186);
+    printf("\n");
+    printf("   ");
+//bordure bas
+    printf("%c", 200);
+    for (int f = 0; f <= 7; f++)
     {
-        printf("Veuillez entrer la coordonnées de colonne : ");
-        scanf("%d", &colonne);
-        if (colonne < 1 || colonne > 10) printf("La coordonnée entrée n'existe pas");
+        for (int a = 0; a <=5; a++) printf ("%c", 205);
+        printf("%c", 202);
     }
-    //controle la validité de la valeur entrée
-    while (colonne < 1 || colonne > 10);
-    //demande et enregistre les coordonnées entrées par l'utilisateur
-    do
-    {
-        printf("Veuillez entrer la coordonnées de ligne : ");
-        scanf("%d", &ligne);
-        if ((ligne - 65) < 0 || (ligne - 65) > 9) printf("La coordonnée entrée n'existe pas");
-    }
-        //controle la validité de la valeur entrée
-    while ((ligne - 65) < 0 || (ligne - 65) > 9);
-    /* Convertit la lettre entrée pour la colonne visée en un chiffre cohérent pour le tableau
-     * en se servant du code ascii des lettres A à J */
-    colonneInt = colonne - 65;
-    //controle si la coodrdonnées entrée correspond à un bateau et définit la case sur "touché si c'est le cas"
-    if (Planjeu [colonneInt][ligne]) Planjeu [colonneInt][ligne] = 3;
-        //si la coordonnées ne correspond à aucun bateau alors la case est définie sur "a l'eau"
-    else if (Planjeu [colonneInt][ligne] == 0) Planjeu [colonneInt][ligne] = 2;
-    //si toutes les cases du croiseur sont touchées alors on passe l'etat des cases à 4, ce qui correspnd à "coulé"
-    if (Planjeu [2][4] == 3 && Planjeu [3][4] == 3 && Planjeu [4][4] == 3 && Planjeu [5][4] == 3)
-    {
-        //cases du croiseur
-        Planjeu [2][4] = 4;
-        Planjeu [3][4] = 4;
-        Planjeu [4][4] = 4;
-        Planjeu [5][4] = 4;
-        croiseurCoule = 1;
-    }
-    if(Planjeu [0][9] == 3 && Planjeu [1][9] == 3 && Planjeu [2][9] == 3 && Planjeu [3][9] == 3 && Planjeu [4][9] == 3)
-    {
-        //cases du porte-avion
-        Planjeu [0][9] = 4;
-        Planjeu [1][9] = 4;
-        Planjeu [2][9] = 4;
-        Planjeu [3][9] = 4;
-        Planjeu [4][9] = 4;
-        porteAvionCoule = 1;
-    }
-    if (Planjeu [9][3] == 3 && Planjeu [9][4] == 3 && Planjeu [9][5] == 3)
-    {
-        //cases du sous-marin 1
-        Planjeu [9][3] = 4;
-        Planjeu [9][4] = 4;
-        Planjeu [9][5] = 4;
-        sousMarin1Coule = 1;
-    }
-    if (Planjeu [3][5] == 3 && Planjeu [4][5] == 3 && Planjeu [5][5] == 3)
-    {
-        //cases du sous-marin 2
-        Planjeu [3][5] = 4;
-        Planjeu [4][5] = 4;
-        Planjeu [5][5] = 4;
-        sousMarin2Coule = 1;
-    }
-    if (Planjeu [0][0] == 3 && Planjeu [1][0] == 3)
-    {
-        //cases du torpilleur
-        Planjeu [0][0] = 4;
-        Planjeu [1][0] = 4;
-        torpilleurCoule = 1;
-    }
+    for (int a = 0; a <=5; a++) printf ("%c", 205);
+    printf("%c", 188);
+    printf("\n\n");
+    printf("%c%c%c%c%c%c : A l'eau\n\n", 177, 177, 177, 177, 177, 177);
+    printf("%c%c%c%c%c%c : Touche\n\n", 178, 178, 178, 178, 178, 178);
+    printf("%c%c%c%c%c%c : Coule\n\n\n", 219, 219, 219, 219, 219, 219);
+
 }
