@@ -16,9 +16,12 @@ void afficherPlanJeu (int tableau [10] [10]);
 void regleJeu ();
 void aideEnregistrement ();
 void cleanerScanf ();
+void login (char *username);
 
 int main() {
-    menu();
+    char username [21] = {""};
+    login(username);
+    menu(username);
     return 0;
 }
 
@@ -313,12 +316,12 @@ void afficherPlanJeu (int tableau [10] [10])
 
     printf("\n");
     //Affiche les entêtes de colones
-    printf("      A       B      C      D      E      F      G      H     I\n");
+    printf("      A       B      C      D      E      F      G      H     I      J\n");
 
     //affiche la bordure du haut
     printf("   ");
     printf("%c", 201);
-    for (int f = 0; f <= 7; f++)
+    for (int f = 0; f <= 8; f++)
     {
         for (int a = 0; a <=5; a++) printf ("%c", 205);
         printf("%c", 203);
@@ -331,7 +334,7 @@ void afficherPlanJeu (int tableau [10] [10])
     for (int e = 0; e <=8 ; e++)
     {
         printf ("%3d", e + 1);
-        for (int c = 0; c <= 8; c++)
+        for (int c = 0; c <= 9; c++)
         {
             printf("%c", 186);
 
@@ -361,7 +364,7 @@ void afficherPlanJeu (int tableau [10] [10])
         //Affichage de la dernière ligne et de la bordure du bas
         printf("   ");
         printf("%c", 204);
-        for (int d = 0; d <= 7; d++)
+        for (int d = 0; d <= 8; d++)
         {
             printf("%c%c%c%c%c%c", 205, 205, 205, 205, 205, 205);
             printf("%c", 206);
@@ -371,7 +374,7 @@ void afficherPlanJeu (int tableau [10] [10])
         printf("\n");
     }
     printf ("%3d", 10);
-    for (int c = 0; c <= 8; c++)
+    for (int c = 0; c <= 9; c++)
     {
         printf("%c", 186);
         switch (tableau [9] [c])
@@ -398,7 +401,7 @@ void afficherPlanJeu (int tableau [10] [10])
     printf("   ");
 //bordure bas
     printf("%c", 200);
-    for (int f = 0; f <= 7; f++)
+    for (int f = 0; f <= 8; f++)
     {
         for (int a = 0; a <=5; a++) printf ("%c", 205);
         printf("%c", 202);
@@ -465,4 +468,15 @@ void cleanerScanf ()
     int voider;
     //stocke ce qui se trouve dans le scanf et remplace son contenu par "rien"
     while((voider=getchar()) != EOF && voider != '\n');
+}
+void login (char *username)
+{
+    for (int i = 0; i < 21; i++) username[i] = 0;
+    system("cls");
+    printf("\nVeuillez entrer votre nom d'utilisateur (longueur max : 20) : ");
+    scanf("%s", username);
+    cleanerScanf();
+    printf("\n\nVous avez bien etes bien connecte avec le nom %s\n\n\n\n\n", username);
+    system("pause");
+    system("cls");
 }
