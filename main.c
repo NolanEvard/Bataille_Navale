@@ -9,19 +9,31 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-void menu();
-void aide ();
-void jeu ();
+#include <sys/types.h>
+#include <time.h>
+
+void menu(char *username);
+void aide (char *username);
+void jeu (char *username);
 void afficherPlanJeu (int tableau [10] [10]);
-void regleJeu ();
-void aideEnregistrement ();
+void regleJeu (char *username);
+void aideEnregistrement (char *username);
 void cleanerScanf ();
 void login (char *username);
+void quit (char *username);
+void logDejaAttaque (char *username, int col, int line);
+void logTouche (char *username, int col, int line);
+void logALeau (char *username, int col, int line);
+void logCoule (char *username, int col, int line);
+void logVictoire (char *username);
+
+FILE* writelog = NULL;
+char buffer[256] = {""};
 
 int main() {
-    char username [21] = {""};
-    login(username);
-    menu(username);
+    char user [21] = {""};
+    login(user);
+    menu(user);
     return 0;
 }
 
@@ -33,10 +45,16 @@ int main() {
  * @param
  */
 
-void menu()
+void menu(char *username)
 {
     // Déclaration et initialisation des variables
     int choixPrincipal = 0;
+    time_t timestamp = time(NULL);
+
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s s'est rendu dans le menu\n", buffer, username);
+    fclose(writelog);
 
     //Affichage du menu principal
     printf("\n\n====================   BATAILLE NAVALE   ====================\n\n\n");
@@ -64,9 +82,9 @@ void menu()
         //s'il rentre 1, le jeu démarre
         case 1:
             system("cls");
-            jeu();
+            jeu(username);
             system("cls");
-            menu();
+            menu(username);
             break;
             //s'il rentre 2, le sywstème d'enregistrement s'affiche
         case 2:
@@ -74,7 +92,7 @@ void menu()
             printf("\nWork in progress...\n");
             system("pause");
             system("cls");
-            menu();
+            menu(username);
             break;
             //s'il rentre 3, ses meilleurs scores s'affichent
         case 3:
@@ -82,19 +100,21 @@ void menu()
             printf("\nWork in progress...\n");
             system("pause");
             system("cls");
-            menu();
+            menu(username);
             break;
             //s'il rentre 4, l'aide s'affiche
         case 4:
             system("cls");
             //affcihage de l'aide
-            aide();
+            aide(username);
             system("cls");
-            menu();
+            menu(username);
             break;
             //s'il rentre 5, le programme s'arrete
         case 5:
+            quit(username);
             break;
+
             //cas extrême, si le programme venait à accéder à cette partie du code qui noramlement n'est pas acessible, alors le programme affiche quand même un message d'erreur
         default:
             printf("Il y a eu une erreur, veuillez redémarrer le programme !");
@@ -107,10 +127,16 @@ void menu()
  * vers la bonne rubrique en exécutant la fonction coprrespondante
  * @param
  */
-void aide ()
+void aide (char *username)
 {
     //déclarations et intialisation de la variable de choix
     int choixAide = 0;
+
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s s'est rendu dans la section aide\n", buffer, username);
+    fclose(writelog);
 
     printf("\n\n=====================    Aide    ====================\n\n");
     //Affichage du menu principal
@@ -131,12 +157,12 @@ void aide ()
         //s'il rentre un, les règles du jeu s'affichent
         case 1:
             system("cls");
-            regleJeu();
+            regleJeu(username);
             break;
             //s'il rentre 2, l'aide pour s'enregistrer s'affiche
         case 2:
             system("cls");
-            aideEnregistrement();
+            aideEnregistrement(username);
             break;
             //si une erreur se produit, le message d'erreur suivant s'affiche
         default:
@@ -151,7 +177,7 @@ void aide ()
  * Cette fonction permet de pouvoir jouer à la bataille navale
  * @param
  */
-void jeu ()
+void jeu (char *username)
 {
     //déclarations et initialisation de variables / tableaux
     int Planjeu [10] [10] = {0};
@@ -180,6 +206,13 @@ void jeu ()
     //position torpilleur
     Planjeu [0][0] = 1;
     Planjeu [1][0] = 1;
+
+    time_t timestamp = time(NULL);
+
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a lancé une partie\n", buffer, username);
+    fclose(writelog);
 
     //début du jeu
     //En-tête
@@ -224,17 +257,29 @@ void jeu ()
             ligne = ligne - 1;
 
             //message d'erreur si la case enrée a déja été attaquée
-            if (Planjeu [ligne] [colonneInt] == 3 || Planjeu [ligne] [colonneInt] == 4 || Planjeu [ligne] [colonneInt] == 2) printf (" \nVous avez deja attaque cette case !\n");
+            if (Planjeu [ligne] [colonneInt] == 3 || Planjeu [ligne] [colonneInt] == 4 || Planjeu [ligne] [colonneInt] == 2)
+            {
+                printf (" \nVous avez deja attaque cette case !\n");
+                logDejaAttaque(username, colonne, ligne);
+            }
         }
             //redemande des coordonnées si la case entrée a déja été attaquée
         while (Planjeu [ligne] [colonneInt] == 3 || Planjeu [ligne] [colonneInt] == 4 || Planjeu [ligne] [colonneInt] == 2);
 
 
-        //controle si la coodrdonnées entrée correspond à un bateau et définit la case sur "touché si c'est le cas"
-        if (Planjeu [ligne] [colonneInt]) Planjeu [ligne][colonneInt] = 3;
+        //controle si la coordonnées entrée correspond à un bateau et définit la case sur "touché si c'est le cas"
+        if (Planjeu [ligne] [colonneInt])
+        {
+            Planjeu [ligne][colonneInt] = 3;
+            logTouche(username, colonne, ligne);
+        }
 
             //si la coordonnées ne correspond à aucun bateau alors la case est définie sur "a l'eau"
-        else if (Planjeu [ligne] [colonneInt] == 0) Planjeu [ligne] [colonneInt] = 2;
+        else if (Planjeu [ligne] [colonneInt] == 0)
+        {
+            Planjeu [ligne] [colonneInt] = 2;
+            logALeau(username,colonne, ligne);
+        }
 
         //si toutes les cases du croiseur sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
         if (Planjeu [2][4] == 3 && Planjeu [3][4] == 3 && Planjeu [4][4] == 3 && Planjeu [5][4] == 3)
@@ -245,6 +290,7 @@ void jeu ()
             Planjeu [4][4] = 4;
             Planjeu [5][4] = 4;
             croiseurCoule = 1;
+            logCoule(username, colonne, ligne);
         }
 
         //si toutes les cases du porte-avion sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
@@ -257,6 +303,7 @@ void jeu ()
             Planjeu [3][8] = 4;
             Planjeu [4][8] = 4;
             porteAvionCoule = 1;
+            logCoule(username, colonne, ligne);
         }
 
         //si toutes les cases du sous-marin 1 sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
@@ -267,6 +314,7 @@ void jeu ()
             Planjeu [9][4] = 4;
             Planjeu [9][5] = 4;
             sousMarin1Coule = 1;
+            logCoule(username, colonne, ligne);
         }
 
         //si toutes les cases du sous-marin 2 sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
@@ -277,6 +325,7 @@ void jeu ()
             Planjeu [4][1] = 4;
             Planjeu [5][1] = 4;
             sousMarin2Coule = 1;
+            logCoule(username, colonne, ligne);
         }
 
         //si toutes les cases du torpilleur sont touchées alors on passe l'etat des cases à 4, ce qui correspond à "coulé"
@@ -286,12 +335,14 @@ void jeu ()
             Planjeu [0][0] = 4;
             Planjeu [1][0] = 4;
             torpilleurCoule = 1;
+            logCoule(username, colonne, ligne);
         }
         //réaffiche le plan de jeu en fonction des changements d'etats des cases causés par la coordonée entrée
         afficherPlanJeu(Planjeu);
     }
         //vérifie la conditon pour la victoire, si tout les bateaux sont coullés alors c'est victoire, sinon on redemande une coordonnées jusqu'à que ce soit le cas
     while (!(croiseurCoule == 1 && porteAvionCoule == 1 && sousMarin1Coule == 1 && sousMarin2Coule == 1 && torpilleurCoule == 1));
+    logVictoire(username);
     printf(" _   _ _      _        _            _ _ _ \n"
            "| | | (_)    | |      (_)          | | | |\n"
            "| | | |_  ___| |_ ___  _ _ __ ___  | | | |\n"
@@ -421,8 +472,14 @@ void afficherPlanJeu (int tableau [10] [10])
  * Cette fonction affiche les règles du jeu
  * @param
  */
-void regleJeu ()
+void regleJeu (char *username)
 {
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a lu les règles du jeu\n", buffer, username);
+    fclose(writelog);
+
     //entête
     printf("\n=====================    Regles du jeu    =====================\n\n");
 
@@ -443,8 +500,13 @@ void regleJeu ()
  * Cette fonction affiche l'aide pour s'enregistrer
  * @param
  */
-void aideEnregistrement ()
+void aideEnregistrement (char *username)
 {
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a eu besoin d'aide pour s'enregister\n", buffer, username);
+    fclose(writelog);
     //entête
     printf("\n\n===================    Comment s'enregister ?    ====================\n\n");
     //Aide pour l'enregistrement
@@ -479,4 +541,52 @@ void login (char *username)
     printf("\n\nVous avez bien etes bien connecte avec le nom %s\n\n\n\n\n", username);
     system("pause");
     system("cls");
+}
+void quit (char *username)
+{
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a quitté le programme\n", buffer, username);
+    fclose(writelog);
+}
+void logDejaAttaque (char *username, int col, int line)
+{
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a attaqué la case %c:%d --> case déja attaquée ! !\n", buffer, username, col, line + 1);
+    fclose(writelog);
+}
+void logTouche (char *username, int col, int line)
+{
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a attaque la case %c:%d --> touché !\n", buffer, username, col, line + 1);
+    fclose(writelog);
+}
+void logALeau (char *username, int col, int line)
+{
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a attaque la case %c:%d --> à l'eau !\n", buffer, username, col, line + 1);
+    fclose(writelog);
+}
+void logCoule (char *username, int col, int line)
+{
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a attaque la case %c:%d --> un bateau est coulé !\n", buffer, username, col, line + 1);
+    fclose(writelog);
+}
+void logVictoire (char *username)
+{
+    time_t timestamp = time(NULL);
+    strftime(buffer, sizeof(buffer), "%A %d %B %Y - %X.", localtime(&timestamp));
+    writelog = fopen("logs", "a");
+    fprintf(writelog, "[ %s ] : L'utilisateur %s a gagné la partie !\n", buffer, username);
+    fclose(writelog);
 }
